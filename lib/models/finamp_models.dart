@@ -2837,6 +2837,8 @@ enum MediaItemParentType {
   rootCollection,
   @HiveField(2)
   instantMix,
+  @HiveField(3)
+  recentlyPlayed,
 }
 
 @JsonSerializable(converters: [BaseItemIdConverter()])

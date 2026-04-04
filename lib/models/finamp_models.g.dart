@@ -1282,7 +1282,7 @@ class MediaItemIdAdapter extends TypeAdapter<MediaItemId> {
       itemId: fields[2] as BaseItemId?,
       parentId: fields[3] as BaseItemId?,
       nameFilter: fields[4] as String?,
-      pageStartIndex: fields[5] as int?,
+      pageStartIndex: (fields[5] as num?)?.toInt(),
     );
   }
 
@@ -2658,6 +2658,8 @@ class MediaItemParentTypeAdapter extends TypeAdapter<MediaItemParentType> {
         return MediaItemParentType.rootCollection;
       case 2:
         return MediaItemParentType.instantMix;
+      case 3:
+        return MediaItemParentType.recentlyPlayed;
       default:
         return MediaItemParentType.collection;
     }
@@ -2672,6 +2674,8 @@ class MediaItemParentTypeAdapter extends TypeAdapter<MediaItemParentType> {
         writer.writeByte(1);
       case MediaItemParentType.instantMix:
         writer.writeByte(2);
+      case MediaItemParentType.recentlyPlayed:
+        writer.writeByte(3);
     }
   }
 
@@ -9572,8 +9576,8 @@ Map<String, dynamic> _$MediaItemIdToJson(MediaItemId instance) =>
         instance.parentId,
         const BaseItemIdConverter().toJson,
       ),
-      if (instance.nameFilter != null) 'nameFilter': instance.nameFilter,
-      if (instance.pageStartIndex != null) 'pageStartIndex': instance.pageStartIndex,
+      'nameFilter': instance.nameFilter,
+      'pageStartIndex': instance.pageStartIndex,
     };
 
 const _$ContentTypeEnumMap = {
@@ -9595,6 +9599,7 @@ const _$MediaItemParentTypeEnumMap = {
   MediaItemParentType.collection: 'collection',
   MediaItemParentType.rootCollection: 'rootCollection',
   MediaItemParentType.instantMix: 'instantMix',
+  MediaItemParentType.recentlyPlayed: 'recentlyPlayed',
 };
 
 Value? _$JsonConverterFromJson<Json, Value>(
