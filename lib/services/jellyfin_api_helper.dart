@@ -245,6 +245,9 @@ class JellyfinApiHelper {
     ArtistType? artistType,
     BaseItemId? genreFilter,
     bool? isFavorite,
+    String? nameStartsWith,
+    String? nameStartsWithOrGreater,
+    String? nameLessThan,
     int? startIndex,
     int? limit,
   }) async {
@@ -265,6 +268,9 @@ class JellyfinApiHelper {
       isFavorite: isFavorite,
       startIndex: startIndex,
       limit: limit,
+      nameStartsWith: nameStartsWith,
+      nameStartsWithOrGreater: nameStartsWithOrGreater,
+      nameLessThan: nameLessThan,
     );
     return response;
   }
@@ -289,6 +295,7 @@ class JellyfinApiHelper {
     String? nameLessThan,
     int? startIndex,
     int? limit,
+    String? nameStartsWith,
   }) async {
     final currentUserId = _finampUserHelper.currentUser!.id;
     assert(_verifyCallable());
