@@ -177,7 +177,7 @@ class AndroidAutoHelper {
       final orderedIds = <BaseItemId>[];
 
       for (final track in tracksResult.items ?? <BaseItemDto>[]) {
-        if (itemId.contentType == TabContentType.artists) {
+        if (itemId.contentType == ContentType.performingArtists) {
           for (final artist in track.albumArtists ?? <NameIdPair>[]) {
             if (seenIds.add(artist.id.raw)) {
               orderedIds.add(artist.id);
@@ -198,7 +198,7 @@ class AndroidAutoHelper {
       // Step 3: fetch the actual album/artist items by ID to get full metadata.
       final itemsResult = await _jellyfinApiHelper.getItemsWithTotalRecordCount(
         itemIds: orderedIds,
-        includeItemTypes: itemId.contentType == TabContentType.artists
+        includeItemTypes: itemId.contentType == ContentType.performingArtists
             ? BaseItemDtoType.artist.jellyfinName
             : BaseItemDtoType.album.jellyfinName,
       );

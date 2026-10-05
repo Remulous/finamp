@@ -295,7 +295,6 @@ class JellyfinApiHelper {
     String? nameLessThan,
     int? startIndex,
     int? limit,
-    String? nameStartsWith,
   }) async {
     final currentUserId = _finampUserHelper.currentUser!.id;
     assert(_verifyCallable());
