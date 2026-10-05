@@ -115,7 +115,7 @@ class AndroidAutoHelper {
         parentItem: parentItem,
         sortBy: sortBy.jellyfinName(itemId.contentType),
         sortOrder: sortOrder.toString(),
-        includeItemTypes: itemId.contentType.itemType.jellyfinName,
+        includeItemTypes: itemId.contentType.itemType?.jellyfinName,
         startIndex: 0,
         limit: 500,
       );
@@ -133,7 +133,7 @@ class AndroidAutoHelper {
       parentItem: parentItem,
       sortBy: sortBy.jellyfinName(itemId.contentType),
       sortOrder: sortOrder.toString(),
-      includeItemTypes: itemId.contentType.itemType.jellyfinName,
+      includeItemTypes: itemId.contentType.itemType?.jellyfinName,
       startIndex: pageStart,
       limit: _pageSize,
       nameStartsWith: nameFilter,
@@ -259,7 +259,7 @@ class AndroidAutoHelper {
       parentItem: parentItem,
       sortBy: sortBy.jellyfinName(itemId.contentType),
       sortOrder: sortOrder.toString(),
-      includeItemTypes: itemId.contentType.itemType.jellyfinName,
+      includeItemTypes: itemId.contentType.itemType?.jellyfinName,
       startIndex: pageStart,
       limit: _pageSize,
     );
@@ -804,9 +804,7 @@ class AndroidAutoHelper {
         mediaItems.add(
           MediaItem(
             id: QueueItemSourceNameType.shuffleAll.name,
-            title:
-                AppLocalizations.of(GlobalSnackbar.materialAppScaffoldKey.currentContext!)?.shuffleAll ??
-                "Shuffle All Tracks",
+            title: GlobalSnackbar.requireL10n.shuffleAll,
             playable: true,
           ),
         );
