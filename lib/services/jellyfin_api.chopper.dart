@@ -273,8 +273,8 @@ final class _$JellyfinApi extends JellyfinApi {
       'Limit': limit,
       'CollapseBoxSetItems': collapseMultiDiscAlbums,
       'NameStartsWith': nameStartsWith,
-    'NameStartsWithOrGreater': nameStartsWithOrGreater,
-    'NameLessThan': nameLessThan,
+      'NameStartsWithOrGreater': nameStartsWithOrGreater,
+      'NameLessThan': nameLessThan,
     };
     final Request $request = Request(
       'GET',

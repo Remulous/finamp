@@ -53,8 +53,33 @@ class AndroidAutoHelper {
 
   /// Letters used for the "Browse by Letter" nodes. Empty string = '#' bucket.
   static const List<String> _alphabet = [
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#',
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+    '#',
   ];
 
   /// Returns the letter nodes A–Z plus a '#' bucket for the Browse-by-Letter view.
@@ -87,13 +112,10 @@ class AndroidAutoHelper {
       final List<BaseItemDto> allItems = [];
       for (final downloadedParent in await _downloadsService.getAllCollections()) {
         if (allItems.length >= offlineModeLimit) break;
-        if (downloadedParent.baseItem != null &&
-            downloadedParent.baseItemType == itemId.contentType.itemType) {
+        if (downloadedParent.baseItem != null && downloadedParent.baseItemType == itemId.contentType.itemType) {
           final name = downloadedParent.baseItem?.name ?? '';
           final firstChar = name.isNotEmpty ? name[0].toUpperCase() : '';
-          final matches = nameFilter == '#'
-              ? !RegExp(r'[A-Za-z]').hasMatch(firstChar)
-              : firstChar == nameFilter;
+          final matches = nameFilter == '#' ? !RegExp(r'[A-Za-z]').hasMatch(firstChar) : firstChar == nameFilter;
           if (matches) allItems.add(downloadedParent.baseItem!);
         }
       }
@@ -102,9 +124,7 @@ class AndroidAutoHelper {
       return (page, sorted.length);
     }
 
-    final parentItem = itemId.contentType == ContentType.playlists
-        ? null
-        : _finampUserHelper.currentUser?.currentView;
+    final parentItem = itemId.contentType == ContentType.playlists ? null : _finampUserHelper.currentUser?.currentView;
 
     // Jellyfin's NameStartsWith doesn't support '#'; for that bucket we fetch
     // the full first page without a name filter and discard alphabetic starters.
@@ -118,12 +138,10 @@ class AndroidAutoHelper {
         startIndex: 0,
         limit: 500,
       );
-      final all = (result.items ?? [])
-          .where((i) {
-            final fc = (i.name?.isNotEmpty ?? false) ? i.name![0].toUpperCase() : '';
-            return !RegExp(r'[A-Za-z]').hasMatch(fc);
-          })
-          .toList();
+      final all = (result.items ?? []).where((i) {
+        final fc = (i.name?.isNotEmpty ?? false) ? i.name![0].toUpperCase() : '';
+        return !RegExp(r'[A-Za-z]').hasMatch(fc);
+      }).toList();
       final page = all.skip(pageStart).take(_pageSize).toList();
       return (page, all.length);
     }
@@ -148,13 +166,7 @@ class AndroidAutoHelper {
   /// then fetch those items by ID to get full artwork + metadata.
   Future<List<MediaItem>> _getRecentlyPlayedItems(MediaItemId itemId) async {
     if (FinampSettingsHelper.finampSettings.isOffline) {
-      return [
-        MediaItem(
-          id: 'recently_played_offline',
-          title: 'Not available offline',
-          playable: false,
-        ),
-      ];
+      return [MediaItem(id: 'recently_played_offline', title: 'Not available offline', playable: false)];
     }
 
     final queueService = GetIt.instance<QueueService>();
@@ -206,10 +218,7 @@ class AndroidAutoHelper {
       final itemsById = <String, BaseItemDto>{
         for (final item in itemsResult.items ?? <BaseItemDto>[]) item.id.raw: item,
       };
-      final sortedItems = orderedIds
-          .map((id) => itemsById[id.raw])
-          .whereType<BaseItemDto>()
-          .toList();
+      final sortedItems = orderedIds.map((id) => itemsById[id.raw]).whereType<BaseItemDto>().toList();
 
       final List<MediaItem> mediaItems = [];
       for (final item in sortedItems) {
@@ -240,8 +249,7 @@ class AndroidAutoHelper {
       final List<BaseItemDto> allItems = [];
       for (final downloadedParent in await _downloadsService.getAllCollections()) {
         if (allItems.length >= offlineModeLimit) break;
-        if (downloadedParent.baseItem != null &&
-            downloadedParent.baseItemType == itemId.contentType.itemType) {
+        if (downloadedParent.baseItem != null && downloadedParent.baseItemType == itemId.contentType.itemType) {
           allItems.add(downloadedParent.baseItem!);
         }
       }
@@ -250,9 +258,7 @@ class AndroidAutoHelper {
       return (page, sorted.length);
     }
 
-    final parentItem = itemId.contentType == ContentType.playlists
-        ? null
-        : _finampUserHelper.currentUser?.currentView;
+    final parentItem = itemId.contentType == ContentType.playlists ? null : _finampUserHelper.currentUser?.currentView;
 
     final result = await _jellyfinApiHelper.getItemsWithTotalRecordCount(
       parentItem: parentItem,
@@ -781,16 +787,18 @@ class AndroidAutoHelper {
         if (pageStart + items.length < totalCount) {
           final nextStart = pageStart + _pageSize;
           final remaining = totalCount - nextStart;
-          mediaItems.add(MediaItem(
-            id: MediaItemId(
-              contentType: itemId.contentType,
-              parentType: MediaItemParentType.rootCollection,
-              nameFilter: nameFilter,
-              pageStartIndex: nextStart,
-            ).toString(),
-            title: "More... ($remaining remaining)",
-            playable: false,
-          ));
+          mediaItems.add(
+            MediaItem(
+              id: MediaItemId(
+                contentType: itemId.contentType,
+                parentType: MediaItemParentType.rootCollection,
+                nameFilter: nameFilter,
+                pageStartIndex: nextStart,
+              ).toString(),
+              title: "More... ($remaining remaining)",
+              playable: false,
+            ),
+          );
         }
 
         return mediaItems;
@@ -810,18 +818,20 @@ class AndroidAutoHelper {
       // "Browse by Letter" node — only on the first page, and only for
       // content types that support letter filtering (albums & artists).
       final pageStart = itemId.pageStartIndex ?? 0;
-      final supportsLetterBrowse = itemId.contentType == ContentType.albums ||
-          itemId.contentType == ContentType.performingArtists;
+      final supportsLetterBrowse =
+          itemId.contentType == ContentType.albums || itemId.contentType == ContentType.performingArtists;
       if (pageStart == 0 && supportsLetterBrowse) {
-        mediaItems.add(MediaItem(
-          id: MediaItemId(
-            contentType: itemId.contentType,
-            parentType: MediaItemParentType.rootCollection,
-            nameFilter: '',
-          ).toString(),
-          title: 'Browse by Letter',
-          playable: false,
-        ));
+        mediaItems.add(
+          MediaItem(
+            id: MediaItemId(
+              contentType: itemId.contentType,
+              parentType: MediaItemParentType.rootCollection,
+              nameFilter: '',
+            ).toString(),
+            title: 'Browse by Letter',
+            playable: false,
+          ),
+        );
       }
 
       final (items, totalCount) = await _fetchRootPage(itemId);
@@ -839,15 +849,17 @@ class AndroidAutoHelper {
       if (pageStart + items.length < totalCount) {
         final nextStart = pageStart + _pageSize;
         final remaining = totalCount - nextStart;
-        mediaItems.add(MediaItem(
-          id: MediaItemId(
-            contentType: itemId.contentType,
-            parentType: MediaItemParentType.rootCollection,
-            pageStartIndex: nextStart,
-          ).toString(),
-          title: "More... ($remaining remaining)",
-          playable: false,
-        ));
+        mediaItems.add(
+          MediaItem(
+            id: MediaItemId(
+              contentType: itemId.contentType,
+              parentType: MediaItemParentType.rootCollection,
+              pageStartIndex: nextStart,
+            ).toString(),
+            title: "More... ($remaining remaining)",
+            playable: false,
+          ),
+        );
       }
 
       return mediaItems;
@@ -869,17 +881,19 @@ class AndroidAutoHelper {
     }
     final nextStart = pageStart + _pageSize;
     if (nextStart < items.length) {
-      mediaItems.add(MediaItem(
-        id: MediaItemId(
-          contentType: itemId.contentType,
-          parentType: itemId.parentType,
-          itemId: itemId.itemId,
-          parentId: itemId.parentId,
-          pageStartIndex: nextStart,
-        ).toString(),
-        title: 'More... (${items.length - nextStart} remaining)',
-        playable: false,
-      ));
+      mediaItems.add(
+        MediaItem(
+          id: MediaItemId(
+            contentType: itemId.contentType,
+            parentType: itemId.parentType,
+            itemId: itemId.itemId,
+            parentId: itemId.parentId,
+            pageStartIndex: nextStart,
+          ).toString(),
+          title: 'More... (${items.length - nextStart} remaining)',
+          playable: false,
+        ),
+      );
     }
     return mediaItems;
   }
