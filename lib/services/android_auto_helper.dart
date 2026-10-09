@@ -30,7 +30,7 @@ class AndroidAutoHelper {
 
   /// Maximum items returned per Android Auto browse page.
   /// Kept well under the ~1MB Binder IPC limit.
-  static const int _pageSize = 200;
+  static const int _pageSize = 50;
 
   // actively remembered search query because Android Auto doesn't give us the extras during a regular search (e.g. clicking the "Search Results" button on the player screen after a voice search)
   AndroidAutoSearchQuery? _lastSearchQuery;
@@ -309,11 +309,9 @@ class AndroidAutoHelper {
         )).toList().map((e) => e.baseItem).whereNotNull().toList();
         artistAlbums.sort((a, b) => (a.premiereDate ?? "").compareTo(b.premiereDate ?? ""));
 
-        final List<BaseItemDto> allTracks = [];
-        for (var album in artistAlbums) {
-          allTracks.addAll(await _downloadsService.getCollectionTracks(album, playable: true));
-        }
-        return allTracks;
+        // The artist is a browsable node in Android Auto. Return albums here;
+        // their tracks are loaded when the driver opens an album.
+        return artistAlbums;
       } else {
         var downloadedParent = await _downloadsService.getCollectionInfo(id: itemId.itemId);
         if (downloadedParent != null && downloadedParent.baseItem != null) {
@@ -856,9 +854,12 @@ class AndroidAutoHelper {
       return mediaItems;
     }
 
+    // Artist and genre nodes can contain hundreds of albums. Keep each browse
+    // response small enough for the Android Auto media browser transaction.
     final items = await getBaseItems(itemId);
+    final pageStart = itemId.pageStartIndex ?? 0;
 
-    for (final item in items) {
+    for (final item in items.skip(pageStart).take(_pageSize)) {
       final mediaItem = await queueService.generateMediaItem(
         item,
         parentType: MediaItemParentType.collection,
@@ -866,6 +867,20 @@ class AndroidAutoHelper {
         isPlayable: _isPlayable,
       );
       mediaItems.add(mediaItem);
+    }
+    final nextStart = pageStart + _pageSize;
+    if (nextStart < items.length) {
+      mediaItems.add(MediaItem(
+        id: MediaItemId(
+          contentType: itemId.contentType,
+          parentType: itemId.parentType,
+          itemId: itemId.itemId,
+          parentId: itemId.parentId,
+          pageStartIndex: nextStart,
+        ).toString(),
+        title: 'More... (${items.length - nextStart} remaining)',
+        playable: false,
+      ));
     }
     return mediaItems;
   }
@@ -1402,14 +1417,12 @@ class AndroidAutoHelper {
     return searchResult;
   }
 
-  // albums, playlists, and tracks should play when clicked
-  // clicking artists starts an instant mix, so they are technically playable
-  // genres has subcategories, so it should be browsable but not playable
+  // Artists and genres have child albums in the car browser. Marking artists
+  // playable makes Android Auto start a mix instead of opening those albums.
   bool _isPlayable({BaseItemDto? item, ContentType? contentType}) {
     final tabContentType = ContentType.fromItemType(item?.type ?? contentType?.itemType?.jellyfinName ?? "Audio");
     return tabContentType == ContentType.albums ||
         tabContentType == ContentType.playlists ||
-        tabContentType.isArtist ||
         tabContentType == ContentType.tracks;
   }
 }
