@@ -95,6 +95,7 @@ class AndroidAutoHelper {
         ).toString(),
         title: letter,
         playable: false,
+        extras: const {'android.media.browse.CONTENT_STYLE_SINGLE_ITEM_HINT': 1},
       );
     }).toList();
   }
@@ -830,6 +831,10 @@ class AndroidAutoHelper {
             ).toString(),
             title: 'Browse by Letter',
             playable: false,
+            extras: const {
+              'android.media.browse.CONTENT_STYLE_SINGLE_ITEM_HINT': 1,
+              'android.media.browse.CONTENT_STYLE_BROWSABLE_HINT': 1,
+            },
           ),
         );
       }
